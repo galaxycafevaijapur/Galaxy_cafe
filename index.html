@@ -1,55 +1,645 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Galaxy Cafe | Order Online</title>
-<style>
-:root{--y:#ffbf18;--bg:#07090d;--card:#11151c;--mut:#aeb4bf}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#fff}
-header{position:sticky;top:0;z-index:5;background:#090b10eF;border-bottom:1px solid #2a2f38;padding:14px 5%;display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:28px;font-weight:900;letter-spacing:2px}.logo b{color:var(--y)}button{cursor:pointer}
-.hero{padding:55px 6%;text-align:center;background:radial-gradient(circle at 50% 0,#28200a,transparent 45%)}
-.badge{color:#09100a;background:#b8ff54;padding:6px 11px;border-radius:20px;font-weight:bold}.hero h1{font-size:clamp(40px,9vw,90px);margin:15px 0 5px}.hero h1 span{color:var(--y)}.hero p{color:#d6d6d6;font-size:18px}
-.info{display:flex;gap:15px;justify-content:center;flex-wrap:wrap;padding:18px;background:#0e1218;border-block:1px solid #252b34}.info div{padding:8px 22px;border-right:1px solid #303640}
-main{max-width:1300px;margin:auto;padding:25px;display:grid;grid-template-columns:1fr 340px;gap:22px}
-h2{color:var(--y)}.menu{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.card{background:var(--card);border:1px solid #34302a;border-radius:14px;padding:16px}.card h3{margin:0 0 10px;color:var(--y);font-size:21px}.item{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #242932;color:#e5e7eb}.item button{background:var(--y);border:0;border-radius:7px;font-weight:bold;padding:4px 9px}.price{color:#fff;white-space:nowrap}
-.cart{position:sticky;top:78px;height:max-content;background:#10141b;border:1px solid #3a3427;border-radius:15px;padding:18px}.cartline{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #2a3038}.total{font-size:25px;color:var(--y);font-weight:bold}
-input,textarea,select{width:100%;padding:12px;margin:6px 0 12px;border-radius:8px;border:1px solid #444;background:#fff;color:#111}
-.whatsapp{width:100%;padding:15px;background:#25D366;color:white;border:0;border-radius:9px;font-size:16px;font-weight:bold}.clear{background:none;color:#ff7777;border:1px solid #633;padding:8px;border-radius:7px}
-.menuimg{max-width:900px;width:100%;display:block;margin:0 auto 25px;border-radius:14px;border:1px solid #3b3425}
-footer{text-align:center;padding:30px;color:#aaa}
-@media(max-width:900px){main{grid-template-columns:1fr}.menu{grid-template-columns:repeat(2,1fr)}.cart{position:static}}@media(max-width:560px){.menu{grid-template-columns:1fr}.hero{padding:35px 5%}.info div{border:0}.menuimg{display:none}}
-</style></head><body>
-<header><div class="logo">GALAXY <b>CAFE</b></div><div>🛒 <span id="count">0</span> Items</div></header>
-<section class="hero"><span class="badge">100% PURE VEG</span><h1>GOOD FOOD.<br><span>GOOD MOOD.</span></h1><p>Fresh • Tasty • Budget Friendly</p><p>📍 Station Road, Near Bank of Baroda, Quadri Complex, 1st Floor, Vaijapur</p></section>
-<div class="info"><div>🌿 100% VEG</div><div>🛵 FAST DELIVERY</div><div>⭐ BEST QUALITY</div><div>📦 SAFE PACKING</div></div>
-<main><section><h2>🍕 ORDER YOUR FAVOURITES</h2><img class="menuimg" src="galaxy-menu.jpg" alt="Galaxy Cafe Menu">
-<div class="menu" id="menu"></div></section>
-<aside class="cart"><h2>YOUR CART</h2><div id="cart"><p style="color:#aaa">Your cart is empty.</p></div><div class="cartline total"><span>TOTAL</span><span>₹<span id="total">0</span></span></div>
-<button class="clear" onclick="clearCart()">Clear Cart</button><h2>DELIVERY DETAILS</h2>
-<input id="name" placeholder="Full Name"><input id="phone" placeholder="Mobile Number" type="tel"><textarea id="address" placeholder="House no., Area, Landmark, City"></textarea>
-<select id="type"><option>Home Delivery</option><option>Self Pickup</option></select><textarea id="note" placeholder="Any special instructions?"></textarea>
-<button class="whatsapp" onclick="order()">📲 PLACE ORDER ON WHATSAPP</button><p style="font-size:12px;color:#aaa;text-align:center">Order will be sent to WhatsApp: 7083862019</p></aside></main>
-<footer>Galaxy Cafe • Fresh Ingredients • Better Taste • Better Mood</footer>
-<script>
-const data={
-"Pizza":[["Plain Veg Cheese Pizza (6 inch)",100],["Plain Veg Cheese Pizza (9 inch)",150],["Onion Cheese Pizza (6 inch)",120],["Onion Cheese Pizza (9 inch)",150],["Cheese Corn Pizza (6 inch)",130],["Cheese Corn Pizza (9 inch)",160],["Onion Capsicum Cheese Pizza (6 inch)",140],["Onion Capsicum Cheese Pizza (9 inch)",180],["Margherita Cheese Pizza (6 inch)",150],["Margherita Cheese Pizza (9 inch)",190],["Paneer Cheese Pizza (6 inch)",150],["Paneer Cheese Pizza (9 inch)",190],["Veg Paneer Loaded Pizza (6 inch)",160],["Veg Paneer Loaded Pizza (9 inch)",200],["Extra Cheese Add",20]],
-"Burgers":[["Veg Aalu Tikki Cheese Burger",60],["Veg Cheese Corn Burger",70],["Paneer Tikki Burger",110],["Cafe Special Mix Veg Cheese Burger",130]],
-"Momos (Veg)":[["Veg Steam Momos (6 pcs)",60],["Veg Fry Momos (6 pcs)",70],["Veg Kurkure Momos (6 pcs)",90],["Paneer Steam Momos (5 pcs)",90],["Paneer Fry Momos (5 pcs)",100],["Veg Cheese Momos (5 pcs)",100]],
-"Sandwich":[["Veg Sandwich",40],["Veg Cheese Grilled Sandwich",50],["Grilled Masala Corn Cheese Sandwich",70],["Cheese Corn Sandwich",60],["Veg Paneer Cheese Grilled Sandwich",80],["Green Tandoori Sandwich",80],["Extreme Cheese Grilled Sandwich",100]],
-"French Fries":[["Salted Fries",50],["Peri Peri Fries",70],["Mayonnaise Fries",80],["Cheese Fries",90]],
-"Pasta":[["Red Sauce Pasta",60],["Masala Pasta",80],["Tamato Chilli Pasta",80],["White Sauce Pasta",130],["Garlic Sauce Pasta",150]],
-"Maggi":[["Plain Maggi",40],["Vegetable Masala Maggi",60],["Corn Masala Maggi",60],["Cheese Corn Maggi",70],["Paneer Cheese Maggi",80]],
-"Cold Coffee":[["Cold Coffee",50],["Chocolate Shake",60],["Oreo Shake",60],["Kit Kat Shake",70]],
-"Hot Drinks":[["Chai",15],["Hot Coffee",20],["Born Vita",40],["Chocolate Hot Coffee",50]],
-"Ice Tea":[["Lemon Juice",40],["Lemon Ice Tea",50]],
-"Mocktail":[["Lemon Mojito",60],["Orange Mojito",70],["Rose Mojito",70],["Jamun Mojito",70],["Pineapple Mojito",70],["Green Mint Mocktail",70]],
-"Pani Puri":[["Pani Puri",30],["Special Pani Puri",50],["Dahi Puri",50],["Veg Puri Bhel",40]],
-"Corn":[["Sweet Corn Bowl",60],["Peri Peri Sweet Corn",50]]
-};
-let cart=[];
-const menu=document.getElementById('menu');
-Object.entries(data).forEach(([cat,items])=>{let c=document.createElement('div');c.className='card';c.innerHTML='<h3>'+cat+'</h3>'+items.map((x,i)=>`<div class="item"><span>${x[0]}</span><span class="price">₹${x[1]} <button onclick='add(${JSON.stringify(cat)},${i})'>+</button></span></div>`).join('');menu.appendChild(c)});
-function add(cat,i){let [n,p]=data[cat][i],x=cart.find(a=>a.n==n);x?x.q++:cart.push({n,p,q:1});render()}
-function render(){document.getElementById('count').textContent=cart.reduce((s,x)=>s+x.q,0);document.getElementById('total').textContent=cart.reduce((s,x)=>s+x.p*x.q,0);document.getElementById('cart').innerHTML=cart.length?cart.map((x,i)=>`<div class="cartline"><span>${x.n}<br>₹${x.p} × ${x.q}</span><span><button onclick="change(${i},-1)">−</button> ${x.q} <button onclick="change(${i},1)">+</button><br><button onclick="removeItem(${i})">❌</button></span></div>`).join(''):'<p style="color:#aaa">Your cart is empty.</p>'}
-function change(i,d){cart[i].q+=d;if(cart[i].q<1)cart.splice(i,1);render()}function removeItem(i){cart.splice(i,1);render()}function clearCart(){cart=[];render()}
-function order(){if(!cart.length)return alert('Please add food items first.');let n=name.value.trim(),p=phone.value.trim(),a=address.value.trim();if(!n||!p||!a)return alert('Please fill Name, Mobile Number and Address.');let lines=cart.map(x=>`• ${x.n} × ${x.q} = ₹${x.p*x.q}`).join('%0A');let total=cart.reduce((s,x)=>s+x.p*x.q,0);let msg=`*GALAXY CAFE - NEW ORDER*%0A%0A*Customer:* ${encodeURIComponent(n)}%0A*Mobile:* ${encodeURIComponent(p)}%0A*Address:* ${encodeURIComponent(a)}%0A*Order Type:* ${encodeURIComponent(type.value)}%0A%0A*Items:*%0A${lines}%0A%0A*TOTAL: ₹${total}*%0A*Note:* ${encodeURIComponent(note.value||'None')}`;window.open('https://wa.me/917083862019?text='+msg,'_blank')}
-</script></body></html>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galaxy Cafe | Online Ordering</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background-color: #0f0f11;
+      color: #fff;
+      padding-bottom: 120px;
+    }
+    header {
+      background: linear-gradient(135deg, #1f1d2b, #252836);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header h1 {
+      color: #ff7ca8;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+    }
+    header p {
+      color: #00e676;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+    .category-title {
+      color: #ea7c69;
+      margin: 30px 0 15px;
+      font-size: 1.4rem;
+      border-bottom: 2px solid #252836;
+      padding-bottom: 5px;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #1f1d2b;
+      border-radius: 16px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transition: transform 0.2s, border 0.2s;
+      border: 1px solid #2d303e;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #ea7c69;
+    }
+    .card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+    .price {
+      color: #ea7c69;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+    .size-select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      background: #2d303e;
+      color: #fff;
+      border: 1px solid #393c4e;
+      margin-bottom: 10px;
+      outline: none;
+    }
+    .checkbox-label {
+      font-size: 0.85rem;
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .add-btn {
+      background: #ea7c69;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .add-btn:hover {
+      background: #e0533c;
+    }
+    .cart-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 500px;
+      background: #252836;
+      border: 1px solid #ea7c69;
+      padding: 15px 20px;
+      border-radius: 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      z-index: 99;
+    }
+    .checkout-btn {
+      background: #00e676;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #1f1d2b;
+      padding: 25px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .modal-content h2 {
+      margin-bottom: 15px;
+      color: #ea7c69;
+    }
+    .modal-content label {
+      font-size: 0.85rem;
+      color: #aaa;
+      display: block;
+      margin-bottom: 4px;
+      text-align: left;
+    }
+    .modal-content input, .modal-content textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #2d303e;
+      background: #2d303e;
+      color: #fff;
+    }
+    .send-btn {
+      background: #25d366;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .close-btn {
+      background: transparent;
+      color: #888;
+      border: none;
+      margin-top: 10px;
+      width: 100%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🌌 GALAXY CAFE</h1>
+    <p>100% Pure Veg • Fast Delivery</p>
+  </header>
+
+  <div class="container">
+    
+    <!-- Pizzas -->
+    <h2 class="category-title">🍕 Gourmet Pizzas</h2>
+    <div class="menu-grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400" alt="Pizza">
+        <h3>Plain Veg Cheese Pizza</h3>
+        <select class="size-select" id="p1-size">
+          <option value="6 inch|100">6 Inch - ₹100</option>
+          <option value="9 inch|150">9 Inch - ₹150</option>
+        </select>
+        <label class="checkbox-label"><input type="checkbox" id="p1-cheese"> Extra Cheese (+₹20)</label>
+        <button class="add-btn" onclick="addPizzaToCart('Plain Veg Cheese Pizza', 'p1-size', 'p1-cheese')">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400" alt="Pizza">
+        <h3>Onion Cheese Pizza</h3>
+        <select class="size-select" id="p2-size">
+          <option value="6 inch|120">6 Inch - ₹120</option>
+          <option value="9 inch|150">9 Inch - ₹150</option>
+        </select>
+        <label class="checkbox-label"><input type="checkbox" id="p2-cheese"> Extra Cheese (+₹20)</label>
+        <button class="add-btn" onclick="addPizzaToCart('Onion Cheese Pizza', 'p2-size', 'p2-cheese')">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=400" alt="Pizza">
+        <h3>Cheese Corn Pizza</h3>
+        <select class="size-select" id="p3-size">
+          <option value="6 inch|130">6 Inch - ₹130</option>
+          <option value="9 inch|160">9 Inch - ₹160</option>
+        </select>
+        <label class="checkbox-label"><input type="checkbox" id="p3-cheese"> Extra Cheese (+₹20)</label>
+        <button class="add-btn" onclick="addPizzaToCart('Cheese Corn Pizza', 'p3-size', 'p3-cheese')">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400" alt="Pizza">
+        <h3>Onion Capsicum Cheese Pizza</h3>
+        <select class="size-select" id="p4-size">
+          <option value="6 inch|140">6 Inch - ₹140</option>
+          <option value="9 inch|180">9 Inch - ₹180</option>
+        </select>
+        <label class="checkbox-label"><input type="checkbox" id="p4-cheese"> Extra Cheese (+₹20)</label>
+        <button class="add-btn" onclick="addPizzaToCart('Onion Capsicum Cheese Pizza', 'p4-size', 'p4-cheese')">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400" alt="Pizza">
+        <h3>Margarita Cheese Pizza</h3>
+        <select class="size-select" id="p5-size">
+          <option value="6 inch|150">6 Inch - ₹150</option>
+          <option value="9 inch|190">9 Inch - ₹190</option>
+        </select>
+        <label class="checkbox-label"><input type="checkbox" id="p5-cheese"> Extra Cheese (+₹20)</label>
+        <button class="add-btn" onclick="addPizzaToCart('Margarita Cheese Pizza', 'p5-size', 'p5-cheese')">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=400" alt="Pizza">
+        <h3>Paneer Cheese Pizza</h3>
+        <select class="size-select" id="p6-size">
+          <option value="6 inch|150">6 Inch - ₹150</option>
+          <option value="9 inch|190">9 Inch - ₹190</option>
+        </select>
+        <label class="checkbox-label"><input type="checkbox" id="p6-cheese"> Extra Cheese (+₹20)</label>
+        <button class="add-btn" onclick="addPizzaToCart('Paneer Cheese Pizza', 'p6-size', 'p6-cheese')">Add to Cart</button>
+      </div>
+
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1544982503-9f984c14501a?w=400" alt="Pizza">
+        <h3>Veg Paneer Loaded Pizza</h3>
+        <select class="size-select" id="p7-size">
+          <option value="6 inch|160">6 Inch - ₹160</option>
+          <option value="9 inch|200">9 Inch - ₹200</option>
+        </select>
+        <label class="checkbox-label"><input type="checkbox" id="p7-cheese"> Extra Cheese (+₹20)</label>
+        <button class="add-btn" onclick="addPizzaToCart('Veg Paneer Loaded Pizza', 'p7-size', 'p7-cheese')">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Burgers -->
+    <h2 class="category-title">🍔 Burgers</h2>
+    <div class="menu-grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400" alt="Burger">
+        <h3>Veg Aalu Tikki Cheese Burger</h3>
+        <p class="price">₹60</p>
+        <button class="add-btn" onclick="addToCart('Veg Aalu Tikki Cheese Burger', 60)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=400" alt="Burger">
+        <h3>Veg Cheese Corn Burger</h3>
+        <p class="price">₹70</p>
+        <button class="add-btn" onclick="addToCart('Veg Cheese Corn Burger', 70)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400" alt="Burger">
+        <h3>Paneer Tikki Burger</h3>
+        <p class="price">₹110</p>
+        <button class="add-btn" onclick="addToCart('Paneer Tikki Burger', 110)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=400" alt="Burger">
+        <h3>Galaxy Special Mix Veg Cheese Burger</h3>
+        <p class="price">₹130</p>
+        <button class="add-btn" onclick="addToCart('Galaxy Special Mix Veg Cheese Burger', 130)">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Veg Momos -->
+    <h2 class="category-title">🥟 Veg Momos</h2>
+    <div class="menu-grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=400" alt="Momos">
+        <h3>Veg Steam Momos (6 pcs)</h3>
+        <p class="price">₹60</p>
+        <button class="add-btn" onclick="addToCart('Veg Steam Momos (6 pcs)', 60)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400" alt="Momos">
+        <h3>Veg Fry Momos (6 pcs)</h3>
+        <p class="price">₹70</p>
+        <button class="add-btn" onclick="addToCart('Veg Fry Momos (6 pcs)', 70)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=400" alt="Momos">
+        <h3>Veg Kurkure Momos (6 pcs)</h3>
+        <p class="price">₹90</p>
+        <button class="add-btn" onclick="addToCart('Veg Kurkure Momos (6 pcs)', 90)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400" alt="Momos">
+        <h3>Paneer Steam Momos (5 pcs)</h3>
+        <p class="price">₹90</p>
+        <button class="add-btn" onclick="addToCart('Paneer Steam Momos (5 pcs)', 90)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=400" alt="Momos">
+        <h3>Paneer Fry Momos (5 pcs)</h3>
+        <p class="price">₹100</p>
+        <button class="add-btn" onclick="addToCart('Paneer Fry Momos (5 pcs)', 100)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400" alt="Momos">
+        <h3>Veg Chocolate Momos (5 pcs)</h3>
+        <p class="price">₹100</p>
+        <button class="add-btn" onclick="addToCart('Veg Chocolate Momos (5 pcs)', 100)">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Sandwich -->
+    <h2 class="category-title">🥪 Sandwiches</h2>
+    <div class="menu-grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400" alt="Sandwich">
+        <h3>Veg Sandwich</h3>
+        <p class="price">₹40</p>
+        <button class="add-btn" onclick="addToCart('Veg Sandwich', 40)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400" alt="Sandwich">
+        <h3>Veg Cheese Grilled Sandwich</h3>
+        <p class="price">₹50</p>
+        <button class="add-btn" onclick="addToCart('Veg Cheese Grilled Sandwich', 50)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400" alt="Sandwich">
+        <h3>Cheese Corn Sandwich</h3>
+        <p class="price">₹60</p>
+        <button class="add-btn" onclick="addToCart('Cheese Corn Sandwich', 60)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400" alt="Sandwich">
+        <h3>Grilled Masala Corn Cheese Sandwich</h3>
+        <p class="price">₹70</p>
+        <button class="add-btn" onclick="addToCart('Grilled Masala Corn Cheese Sandwich', 70)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400" alt="Sandwich">
+        <h3>Veg Paneer Cheese Grilled Sandwich</h3>
+        <p class="price">₹80</p>
+        <button class="add-btn" onclick="addToCart('Veg Paneer Cheese Grilled Sandwich', 80)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400" alt="Sandwich">
+        <h3>Green Tandoori Sandwich</h3>
+        <p class="price">₹80</p>
+        <button class="add-btn" onclick="addToCart('Green Tandoori Sandwich', 80)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400" alt="Sandwich">
+        <h3>Extreme Cheese Grilled Sandwich</h3>
+        <p class="price">₹100</p>
+        <button class="add-btn" onclick="addToCart('Extreme Cheese Grilled Sandwich', 100)">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- French Fries -->
+    <h2 class="category-title">🍟 French Fries</h2>
+    <div class="menu-grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400" alt="Fries">
+        <h3>Salted Fries</h3>
+        <p class="price">₹50</p>
+        <button class="add-btn" onclick="addToCart('Salted Fries', 50)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400" alt="Fries">
+        <h3>Peri Peri Fries</h3>
+        <p class="price">₹70</p>
+        <button class="add-btn" onclick="addToCart('Peri Peri Fries', 70)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400" alt="Fries">
+        <h3>Mayonnaise Fries</h3>
+        <p class="price">₹80</p>
+        <button class="add-btn" onclick="addToCart('Mayonnaise Fries', 80)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400" alt="Fries">
+        <h3>Cheese Fries</h3>
+        <p class="price">₹90</p>
+        <button class="add-btn" onclick="addToCart('Cheese Fries', 90)">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Sweet Corn -->
+    <h2 class="category-title">🌽 Sweet Corn</h2>
+    <div class="menu-grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400" alt="Corn">
+        <h3>Sweet Corn Bowl</h3>
+        <p class="price">₹40</p>
+        <button class="add-btn" onclick="addToCart('Sweet Corn Bowl', 40)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400" alt="Corn">
+        <h3>Peri Peri Sweet Corn</h3>
+        <p class="price">₹50</p>
+        <button class="add-btn" onclick="addToCart('Peri Peri Sweet Corn', 50)">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Pani Puri & Chaat -->
+    <h2 class="category-title">🥣 Pani Puri & Chaat</h2>
+    <div class="menu-grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400" alt="Pani Puri">
+        <h3>Pani Puri</h3>
+        <p class="price">₹30</p>
+        <button class="add-btn" onclick="addToCart('Pani Puri', 30)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400" alt="Pani Puri">
+        <h3>Special Pani Puri</h3>
+        <p class="price">₹50</p>
+        <button class="add-btn" onclick="addToCart('Special Pani Puri', 50)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400" alt="Dahi Puri">
+        <h3>Dahi Puri</h3>
+        <p class="price">₹50</p>
+        <button class="add-btn" onclick="addToCart('Dahi Puri', 50)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400" alt="Bhel">
+        <h3>Veg Mix Bhel</h3>
+        <p class="price">₹40</p>
+        <button class="add-btn" onclick="addToCart('Veg Mix Bhel', 40)">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Pasta -->
+    <h2 class="category-title">🍝 Pasta</h2>
+    <div class="menu-grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1621996346565-e3d5d6281273?w=400" alt="Pasta">
+        <h3>Red Sauce Pasta</h3>
+        <p class="price">₹60</p>
+        <button class="add-btn" onclick="addToCart('Red Sauce Pasta', 60)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1621996346565-e3d5d6281273?w=400" alt="Pasta">
+        <h3>Masala Pasta</h3>
+        <p class="price">₹80</p>
+        <button class="add-btn" onclick="addToCart('Masala Pasta', 80)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1621996346565-e3d5d6281273?w=400" alt="Pasta">
+        <h3>Tomato Garlic Pasta</h3>
+        <p class="price">₹80</p>
+        <button class="add-btn" onclick="addToCart('Tomato Garlic Pasta', 80)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1621996346565-e3d5d6281273?w=400" alt="Pasta">
+        <h3>White Sauce Pasta</h3>
+        <p class="price">₹130</p>
+        <button class="add-btn" onclick="addToCart('White Sauce Pasta', 130)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1621996346565-e3d5d6281273?w=400" alt="Pasta">
+        <h3>Garlic Sauce Pasta</h3>
+        <p class="price">₹150</p>
+        <button class="add-btn" onclick="addToCart('Garlic Sauce Pasta', 150)">Add to Cart</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Cart Bar -->
+  <div class="cart-bar" id="cartBar" style="display: none;">
+    <div>
+      <span id="cartCount" style="font-weight: bold; color: #ea7c69;">0 Items</span>
+      <p id="cartTotal" style="font-weight: bold; font-size: 1.1rem; color: #fff;">Total: ₹0</p>
+    </div>
+    <button class="checkout-btn" onclick="openCheckoutModal()">Checkout 🛒</button>
+  </div>
+
+  <!-- Customer Detail Modal -->
+  <div class="modal" id="checkoutModal">
+    <div class="modal-content">
+      <h2>Order Details</h2>
+      <label for="custName">आपका नाम (Name):</label>
+      <input type="text" id="custName" placeholder="उदा. Rahul Sharma" required>
+      
+      <label for="custPhone">फ़ोन नंबर (Phone):</label>
+      <input type="tel" id="custPhone" placeholder="उदा. 9876543210" required>
+      
+      <label for="custAddress">पूरा पता (Delivery Address):</label>
+      <textarea id="custAddress" rows="3" placeholder="घर का पता, लैंडमार्क..." required></textarea>
+
+      <button class="send-btn" onclick="sendOrderToWhatsApp()">WhatsApp पर आर्डर भेजें 📲</button>
+      <button class="close-btn" onclick="closeCheckoutModal()">रद्द करें (Cancel)</button>
+    </div>
+  </div>
+
+  <script>
+    // आपका व्हाट्सएप नंबर यहाँ अपडेट किया गया है
+    const PHONE_NUMBER = "917219487819"; 
+    let cart = [];
+
+    // नॉर्मल आइटम कार्ट में जोड़ने के लिए
+    function addToCart(itemName, price) {
+      cart.push({ name: itemName, price: price });
+      updateCartUI();
+    }
+
+    // पिज्जा (साइज और एक्स्ट्रा चीज़) कार्ट में जोड़ने के लिए
+    function addPizzaToCart(pizzaName, sizeSelectId, cheeseCheckboxId) {
+      const sizeSelect = document.getElementById(sizeSelectId);
+      const isExtraCheese = document.getElementById(cheeseCheckboxId).checked;
+      
+      const [size, priceStr] = sizeSelect.value.split('|');
+      let finalPrice = parseInt(priceStr);
+      let fullName = `${pizzaName} (${size})`;
+
+      if (isExtraCheese) {
+        finalPrice += 20;
+        fullName += " + Extra Cheese";
+      }
+
+      cart.push({ name: fullName, price: finalPrice });
+      updateCartUI();
+    }
+
+    // कार्ट UI को अपडेट करने के लिए
+    function updateCartUI() {
+      const cartBar = document.getElementById('cartBar');
+      const cartCount = document.getElementById('cartCount');
+      const cartTotal = document.getElementById('cartTotal');
+
+      if (cart.length > 0) {
+        cartBar.style.display = 'flex';
+        cartCount.innerText = `${cart.length} Item(s) Selected`;
+        
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        cartTotal.innerText = `Total: ₹${total}`;
+      } else {
+        cartBar.style.display = 'none';
+      }
+    }
+
+    function openCheckoutModal() {
+      document.getElementById('checkoutModal').style.display = 'flex';
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').style.display = 'none';
+    }
+
+    // व्हाट्सएप पर डायरेक्ट ऑर्डर भेजने का फ़ंक्शन
+    function sendOrderToWhatsApp() {
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const address = document.getElementById('custAddress').value.trim();
+
+      if (!name || !phone || !address) {
+        alert("कृपया नाम, फ़ोन नंबर और पता भरें!");
+        return;
+      }
+
+      let orderSummary = "🌌 *NEW ORDER - GALAXY CAFE* 🌌\n\n";
+      orderSummary += `👤 *Name:* ${name}\n`;
+      orderSummary += `📞 *Phone:* ${phone}\n`;
+      orderSummary += `📍 *Address:* ${address}\n\n`;
+      orderSummary += "📝 *Order Items:*\n";
+
+      let total = 0;
+      cart.forEach((item, index) => {
+        orderSummary += `${index + 1}. ${item.name} - ₹${item.price}\n`;
+        total += item.price;
+      });
+
+      orderSummary += `\n💰 *Total Amount:* ₹${total}`;
+      orderSummary += "\n------------------------------";
+      orderSummary += "\nकृपया ऑर्डर कन्फर्म करें। धन्यवाद!";
+
+      // WhatsApp API Link
+      const encodedMsg = encodeURIComponent(orderSummary);
+      const whatsappURL = `https://wa.me/${PHONE_NUMBER}?text=${encodedMsg}`;
+
+      // व्हाट्सएप खोलें
+      window.open(whatsappURL, '_blank');
+      closeCheckoutModal();
+    }
+  </script>
+
+</body>
+</html>
